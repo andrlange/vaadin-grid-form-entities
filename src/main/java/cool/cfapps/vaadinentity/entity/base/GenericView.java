@@ -206,9 +206,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
 
                 });
 
-        // Add buttons
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        //delete.getStyle().set("margin-left", "auto");  // Push delete to the right
         delete.setVisible(false);  // Initially hidden until selection
         HorizontalLayout buttons = new HorizontalLayout(save, cancel, delete);
         form.add(buttons);
@@ -303,7 +301,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
             }
         });
 
-        // Add selection listener
         grid.asSingleSelect().addValueChangeListener(event -> {
             selectedItem = event.getValue();
             editor.setVisible(selectedItem != null);
@@ -324,7 +321,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     }
 
 
-    // Add this new method to create an empty instance
     protected T createEmptyInstance() {
         try {
             return entityClass.getDeclaredConstructor().newInstance();
@@ -333,7 +329,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         }
     }
 
-    // Add this method to handle the add action
     public void addNew() {
         editor.setVisible(true);
         // Create empty instance
@@ -344,7 +339,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         form.getElement().scrollIntoView();
     }
 
-    // Add helper method to clear the form
     private void clearForm() {
         selectedItem = null;
         binder.readBean(null);
