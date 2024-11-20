@@ -35,4 +35,6 @@ build/
 ##other
 /vols/
 .fastRequest/
+/src/main/frontend/generated/
+
 
