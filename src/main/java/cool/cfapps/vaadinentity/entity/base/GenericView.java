@@ -3,12 +3,15 @@ package cool.cfapps.vaadinentity.entity.base;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
@@ -24,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
 public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     private final Grid<T> grid;
     private final FormLayout form;
@@ -32,8 +34,10 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     private T selectedItem;
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
+    private final Button delete = new Button("Delete");
     private final Binder<T> binder;
     private final Div editor = new Div();
+    public final Div gridContainer = new Div();
 
     protected GenericView(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -56,8 +60,8 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         form.getStyle().set("margin-left", "20px");
         editor.add(form);
         editor.setVisible(false);
-
-        splitLayout.addToPrimary(grid);
+        gridContainer.add(grid);
+        splitLayout.addToPrimary(gridContainer);
         splitLayout.addToSecondary(editor);
 
         splitLayout.setSplitterPosition(80.0);
@@ -149,12 +153,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                             .setSortable(columnInfo.sortable());
                 });
 
-        // Add selection listener
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            selectedItem = event.getValue();
-            editor.setVisible(true);
-            binder.readBean(selectedItem);
-        });
     }
 
 
@@ -209,7 +207,10 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                 });
 
         // Add buttons
-        HorizontalLayout buttons = new HorizontalLayout(save, cancel);
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        //delete.getStyle().set("margin-left", "auto");  // Push delete to the right
+        delete.setVisible(false);  // Initially hidden until selection
+        HorizontalLayout buttons = new HorizontalLayout(save, cancel, delete);
         form.add(buttons);
     }
 
@@ -257,7 +258,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
             return new Checkbox();
         } else if (type == LocalDateTime.class) {
             return new DateTimePicker();
-        }else if (type == LocalDate.class) {
+        } else if (type == LocalDate.class) {
             return new DatePicker();
         }
         // Add more field types as needed
@@ -269,14 +270,45 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
             if (selectedItem != null && binder.writeBeanIfValid(selectedItem)) {
                 saveEntity(selectedItem);
                 refreshGrid();
-                editor.setVisible(false);
+                // Clear form after successful save
+                clearForm();
             }
         });
 
         cancel.addClickListener(event -> {
-            selectedItem = null;
-            binder.readBean(null);
-            editor.setVisible(false);
+            clearForm();
+        });
+
+        delete.addClickListener(event -> {
+            if (selectedItem != null) {
+                // Create confirmation dialog
+                ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setHeader("Confirm Delete");
+                dialog.setText("Are you sure you want to delete this item? This action cannot be undone.");
+
+                dialog.setCancelable(true);
+                dialog.setCancelText("Cancel");
+
+                dialog.setConfirmText("Delete");
+                dialog.setConfirmButtonTheme("error primary");
+
+                dialog.addConfirmListener(confirmEvent -> {
+                    deleteEntity(selectedItem);
+                    clearForm();
+                    refreshGrid();
+                    Notification.show("Item deleted", 3000, Notification.Position.TOP_CENTER);
+                });
+
+                dialog.open();
+            }
+        });
+
+        // Add selection listener
+        grid.asSingleSelect().addValueChangeListener(event -> {
+            selectedItem = event.getValue();
+            editor.setVisible(selectedItem != null);
+            delete.setVisible(selectedItem != null);
+            binder.readBean(selectedItem);
         });
     }
 
@@ -285,8 +317,39 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
 
     protected abstract List<T> loadEntities();
 
+    protected abstract void deleteEntity(T entity);
+
     public void refreshGrid() {
         grid.setItems(loadEntities());
+    }
+
+
+    // Add this new method to create an empty instance
+    protected T createEmptyInstance() {
+        try {
+            return entityClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create empty instance of " + entityClass.getSimpleName(), e);
+        }
+    }
+
+    // Add this method to handle the add action
+    public void addNew() {
+        editor.setVisible(true);
+        // Create empty instance
+        selectedItem = createEmptyInstance();
+        // Clear and set the binder
+        binder.readBean(selectedItem);
+        // Optional: Scroll form into view or highlight it
+        form.getElement().scrollIntoView();
+    }
+
+    // Add helper method to clear the form
+    private void clearForm() {
+        selectedItem = null;
+        binder.readBean(null);
+        editor.setVisible(false);
+        delete.setVisible(false);
     }
 
     private record GridColumnInfo(String propertyName, String header, int order, boolean sortable, Class<?> type,
