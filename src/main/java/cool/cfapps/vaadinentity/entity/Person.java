@@ -3,8 +3,6 @@ package cool.cfapps.vaadinentity.entity;
 import cool.cfapps.vaadinentity.entity.base.BaseEntity;
 import cool.cfapps.vaadinentity.entity.base.FormField;
 import cool.cfapps.vaadinentity.entity.base.GridColumn;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,9 +33,14 @@ public class Person implements BaseEntity {
     @FormField(label = "Is Active", required = true, order = 4)
     private Boolean isActive;
 
-    @GridColumn(header = "Birthday", order = 5, dateTimeFormat = "dd.MM.yyyy")
+    @GridColumn(header = "Birthday", order = 6, dateTimeFormat = "dd.MM.yyyy")
     @FormField(label = "Birthday", required = true)
     private LocalDate birthday;
+
+    @GridColumn(header = "Active Component", order = 5, showAsComponent = true)
+    public Boolean exampleBoolean(){
+        return isActive;  // Just for demonstration purpose Component
+    }
 
     @GridColumn(header = "Age", order = 6)
     public int getAge() {

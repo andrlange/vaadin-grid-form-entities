@@ -12,4 +12,5 @@ public @interface GridColumn {
     int order() default 999;
     boolean sortable() default true;
     String dateTimeFormat() default "";
+    boolean showAsComponent() default false;
 }

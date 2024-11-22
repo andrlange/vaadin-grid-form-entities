@@ -87,7 +87,8 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                             annotation.sortable(),
                             field.getType(),
                             null,
-                            annotation.dateTimeFormat()
+                            annotation.dateTimeFormat(),
+                            annotation.showAsComponent()
                     ));
                 });
 
@@ -97,9 +98,10 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                 .forEach(method -> {
                     GridColumn annotation = method.getAnnotation(GridColumn.class);
                     String propertyName = method.getName();
-                    if (propertyName.startsWith("get")) {
-                        propertyName = propertyName.substring(3, 4).toLowerCase() +
-                                       propertyName.substring(4);
+                    if (propertyName.startsWith("get") || propertyName.startsWith("is")) {
+                        propertyName = propertyName.startsWith("get") ?
+                                propertyName.substring(3, 4).toLowerCase() + propertyName.substring(4) :
+                                propertyName.substring(2, 3).toLowerCase() + propertyName.substring(3);
                     }
 
                     gridColumns.add(new GridColumnInfo(
@@ -109,7 +111,8 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                             annotation.sortable(),
                             method.getReturnType(),
                             method,
-                            annotation.dateTimeFormat()
+                            annotation.dateTimeFormat(),
+                            annotation.showAsComponent()
                     ));
                 });
 
@@ -119,40 +122,60 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
                 .forEach(columnInfo -> {
                     Grid.Column<T> column;
 
-                    if (columnInfo.method() != null) {
-                        // For method-based columns
-                        column = grid.addColumn(item -> {
-                            try {
-                                Object value = columnInfo.method().invoke(item);
-                                return formatValue(value, columnInfo);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                return null;
+                    // Get value function that works for both methods and fields
+                    ValueProvider<T, ?> valueProvider = item -> {
+                        try {
+                            Object value;
+                            if (columnInfo.method() != null) {
+                                value = columnInfo.method().invoke(item);
+                            } else {
+                                Field field = entityClass.getDeclaredField(columnInfo.propertyName());
+                                field.setAccessible(true);
+                                value = field.get(item);
                             }
+                            return value;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    };
+
+                    // Create appropriate column based on type and showAsComponent
+                    if (columnInfo.showAsComponent() &&
+                        (columnInfo.type() == Boolean.class || columnInfo.type() == boolean.class)) {
+                        // Boolean component column
+                        column = grid.addComponentColumn(item -> {
+                            Boolean value = (Boolean) valueProvider.apply(item);
+                            Checkbox checkbox = new Checkbox(value != null ? value : false);
+                            checkbox.setReadOnly(true);
+                            return checkbox;
+                        });
+                    } else if (isTemporalType(columnInfo.type()) && !columnInfo.dateTimeFormat().isEmpty()) {
+                        // DateTime column with formatting
+                        column = grid.addColumn(item -> {
+                            Object value = valueProvider.apply(item);
+                            return formatValue(value, columnInfo);
                         });
                     } else {
-                        // For field-based columns
-                        if (isTemporalType(columnInfo.type()) && !columnInfo.dateTimeFormat().isEmpty()) {
-                            column = grid.addColumn(item -> {
-                                try {
-                                    Field field = entityClass.getDeclaredField(columnInfo.propertyName());
-                                    field.setAccessible(true);
-                                    Object value = field.get(item);
-                                    return formatValue(value, columnInfo);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    return null;
-                                }
-                            });
-                        } else {
-                            column = grid.addColumn(columnInfo.propertyName());
-                        }
+                        // Regular value column with potential formatting
+                        column = grid.addColumn(item -> {
+                            Object value = valueProvider.apply(item);
+                            return formatValue(value, columnInfo);
+                        });
                     }
 
+                    // Configure column properties
                     column.setHeader(columnInfo.header())
-                            .setSortable(columnInfo.sortable());
+                            .setSortable(columnInfo.sortable())
+                            .setKey(columnInfo.propertyName());
                 });
 
+    }
+
+    // Helper interface for value extraction
+    @FunctionalInterface
+    private interface ValueProvider<T, R> {
+        R apply(T item);
     }
 
 
@@ -347,6 +370,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     }
 
     private record GridColumnInfo(String propertyName, String header, int order, boolean sortable, Class<?> type,
-                                  Method method, String dateTimeFormat) {
+                                  Method method, String dateTimeFormat, boolean showAsComponent) {
     }
 }
