@@ -3,6 +3,8 @@ package cool.cfapps.vaadinentity.entity;
 import cool.cfapps.vaadinentity.entity.base.BaseEntity;
 import cool.cfapps.vaadinentity.entity.base.FormField;
 import cool.cfapps.vaadinentity.entity.base.GridColumn;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,14 +19,19 @@ public class Person implements BaseEntity {
     @GridColumn(header = "ID", order = 0)
     private Long personId;
 
+    @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     @GridColumn(header = "First Name", order = 1)
     @FormField(label = "First Name", required = true, order = 1)
     private String firstName;
 
+    @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     @GridColumn(header = "Last Name", order = 2)
     @FormField(label = "Last Name", required = true, order = 2)
     private String lastName;
 
+    @NotBlank(message = "Email is required")
     @GridColumn(header = "Email", order = 3, sortable = false)
     @FormField(label = "Email", required = true, order = 3)
     private String email;

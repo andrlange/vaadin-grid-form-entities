@@ -2,6 +2,7 @@ package cool.cfapps.vaadinentity.entity.base;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -17,7 +18,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,7 +38,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
     private final Button delete = new Button("Delete");
-    private final Binder<T> binder;
+    private final BeanValidationBinder<T> binder;
     private final Div editor = new Div();
     public final Div gridContainer = new Div();
 
@@ -43,7 +46,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         this.entityClass = entityClass;
         this.grid = new Grid<>(entityClass, false);
         this.form = new FormLayout();
-        this.binder = new Binder<>(entityClass);
+        this.binder = new BeanValidationBinder<>(entityClass);
 
         setupLayout();
         setupGrid();
@@ -224,6 +227,14 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
 
                     Component component = createFormField(field);
                     form.addFormItem(component, label);
+
+                    // Set required indicator on the component if it supports it
+                    if (component instanceof HasValueAndElement) {
+                        ((HasValueAndElement) component).setRequiredIndicatorVisible(
+                                field.isAnnotationPresent(NotNull.class) ||
+                                field.isAnnotationPresent(NotBlank.class)
+                        );
+                    }
 
                     setupFieldBinding(field, component);
 

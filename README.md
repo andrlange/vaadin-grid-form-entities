@@ -7,7 +7,8 @@ Based on:
 - JDK21
 
 ### NEW
-Added Vaadin Component-Column example to GenericGrid for Boolean values of entity properties und methods.
+- Added Vaadin Component-Column example to GenericGrid for Boolean values of entity properties und methods.
+- Added Spring Boot Starter Validation to enable Form validation.
 
 ## Annotations
 
@@ -48,21 +49,26 @@ This demo provides two entity types:
 #### Example
 
 ```JAVA
-@Data
+@@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Person implements BaseEntity {
    @GridColumn(header = "ID", order = 0)
    private Long personId;
 
+   @NotBlank(message = "First name is required")
+   @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
    @GridColumn(header = "First Name", order = 1)
    @FormField(label = "First Name", required = true, order = 1)
    private String firstName;
 
+   @NotBlank(message = "Last name is required")
+   @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
    @GridColumn(header = "Last Name", order = 2)
    @FormField(label = "Last Name", required = true, order = 2)
    private String lastName;
 
+   @NotBlank(message = "Email is required")
    @GridColumn(header = "Email", order = 3, sortable = false)
    @FormField(label = "Email", required = true, order = 3)
    private String email;
