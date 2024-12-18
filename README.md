@@ -3,7 +3,7 @@ This demo shows how you can extend your data entities to auto-generate Grids and
 
 Based on:
 - Spring Boot 3.4.0
-- Vaadin Flow 24.5.7
+- Vaadin Flow 24.6.0
 - JDK21
 
 ### NEW
