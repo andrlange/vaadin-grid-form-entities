@@ -23,8 +23,6 @@ public class AddressView extends GenericView<Address> {
         super(Address.class);
         this.dataService = dataService;
         refreshGrid();
-
-        gridContainer.addComponentAsFirst(new AddButton(this::addNew));
     }
 
     @Override

@@ -22,9 +22,6 @@ public class PersonView extends GenericView<Person> {
         super(Person.class);
         this.dataService = dataService;
         refreshGrid();
-
-        // Add Button for adding new person
-        gridContainer.addComponentAsFirst(new AddButton(this::addNew));
     }
 
     @Override

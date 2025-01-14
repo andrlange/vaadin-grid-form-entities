@@ -19,6 +19,7 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import cool.cfapps.vaadinentity.views.components.AddButton;
 import cool.cfapps.vaadinentity.views.components.DeleteButton;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -64,6 +65,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         form.getStyle().setMarginLeft("20px");
         editor.add(form);
         editor.setVisible(false);
+        gridContainer.add(new AddButton(this::addNew));
         gridContainer.add(grid);
         splitLayout.addToPrimary(gridContainer);
         splitLayout.addToSecondary(editor);
