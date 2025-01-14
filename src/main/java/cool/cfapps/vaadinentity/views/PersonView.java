@@ -1,13 +1,12 @@
 package cool.cfapps.vaadinentity.views;
 
-import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import cool.cfapps.vaadinentity.entity.Person;
 import cool.cfapps.vaadinentity.entity.base.GenericView;
 import cool.cfapps.vaadinentity.service.DataService;
+import cool.cfapps.vaadinentity.views.components.AddButton;
 
 import java.util.List;
 
@@ -25,13 +24,7 @@ public class PersonView extends GenericView<Person> {
         refreshGrid();
 
         // Add Button for adding new person
-        Div addButton = new Div();
-        addButton.setClassName("circle-button-container");
-        Avatar addAvatar = new Avatar("+");
-        addAvatar.addClassName("circle-button");
-        addButton.add(addAvatar);
-        addButton.addClickListener(event -> addNew());
-        gridContainer.addComponentAsFirst(addButton);
+        gridContainer.addComponentAsFirst(new AddButton(this::addNew));
     }
 
     @Override

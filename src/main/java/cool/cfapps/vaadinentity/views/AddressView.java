@@ -8,6 +8,7 @@ import com.vaadin.flow.router.Route;
 import cool.cfapps.vaadinentity.entity.Address;
 import cool.cfapps.vaadinentity.entity.base.GenericView;
 import cool.cfapps.vaadinentity.service.DataService;
+import cool.cfapps.vaadinentity.views.components.AddButton;
 
 import java.util.List;
 
@@ -23,14 +24,7 @@ public class AddressView extends GenericView<Address> {
         this.dataService = dataService;
         refreshGrid();
 
-        // Add Button for adding new person
-        Div addButton = new Div();
-        addButton.setClassName("circle-button-container");
-        Avatar addAvatar = new Avatar("+");
-        addAvatar.addClassName("circle-button");
-        addButton.add(addAvatar);
-        addButton.addClickListener(event -> addNew());
-        gridContainer.addComponentAsFirst(addButton);
+        gridContainer.addComponentAsFirst(new AddButton(this::addNew));
     }
 
     @Override

@@ -18,35 +18,3 @@ vaadin-side-nav-item vaadin-icon {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
-
-.circle-button {
-  width: 40px;            /* Width and height must be the same */
-  height: 40px;
-  border-radius: 50%;     /* 50% border-radius ensures a circular shape */
-  padding: 0;             /* Ensure no padding */
-  font-size: 24px;        /* Adjust font size for the plus sign */
-  text-align: center;
-  color: white;
-  background-color: #0056b3;
-  border: none;           /* Remove border */
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.3s ease;
-}
-
-.circle-button:hover {
-  background-color: cornflowerblue; /* Darker shade for hover effect */
-}
-
-.circle-button:focus {
-  outline: none;      /* Remove outline when focused */
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
-}
-
-.circle-button-container {
-  width: 40px;            /* Width and height must be the same */
-  height: 40px;
-  margin: 10px;
-}
