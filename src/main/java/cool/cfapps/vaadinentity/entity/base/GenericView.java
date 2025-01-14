@@ -19,6 +19,7 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import cool.cfapps.vaadinentity.views.components.DeleteButton;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -37,7 +38,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
     private T selectedItem;
     private final Button save = new Button("Save");
     private final Button cancel = new Button("Cancel");
-    private final Button delete = new Button("Delete");
+    private final DeleteButton delete = new DeleteButton();
     private final BeanValidationBinder<T> binder;
     private final Div editor = new Div();
     public final Div gridContainer = new Div();
@@ -60,7 +61,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         // Create a split layout for grid and form
         SplitLayout splitLayout = new SplitLayout();
         splitLayout.setSizeFull();
-        form.getStyle().set("margin-left", "20px");
+        form.getStyle().setMarginLeft("20px");
         editor.add(form);
         editor.setVisible(false);
         gridContainer.add(grid);
@@ -240,7 +241,6 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
 
                 });
 
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         delete.setVisible(false);  // Initially hidden until selection
         HorizontalLayout buttons = new HorizontalLayout(save, cancel, delete);
         form.add(buttons);
@@ -311,28 +311,11 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
             clearForm();
         });
 
-        delete.addClickListener(event -> {
-            if (selectedItem != null) {
-                // Create confirmation dialog
-                ConfirmDialog dialog = new ConfirmDialog();
-                dialog.setHeader("Confirm Delete");
-                dialog.setText("Are you sure you want to delete this item? This action cannot be undone.");
-
-                dialog.setCancelable(true);
-                dialog.setCancelText("Cancel");
-
-                dialog.setConfirmText("Delete");
-                dialog.setConfirmButtonTheme("error primary");
-
-                dialog.addConfirmListener(confirmEvent -> {
-                    deleteEntity(selectedItem);
-                    clearForm();
-                    refreshGrid();
-                    Notification.show("Item deleted", 3000, Notification.Position.TOP_CENTER);
-                });
-
-                dialog.open();
-            }
+        delete.setDeleteListener(() -> {
+            deleteEntity(selectedItem);
+            clearForm();
+            refreshGrid();
+            Notification.show("Item deleted", 3000, Notification.Position.TOP_CENTER);
         });
 
         grid.asSingleSelect().addValueChangeListener(event -> {
@@ -370,7 +353,7 @@ public abstract class GenericView<T extends BaseEntity> extends VerticalLayout {
         // Clear and set the binder
         binder.readBean(selectedItem);
         // Optional: Scroll form into view or highlight it
-        form.getElement().scrollIntoView();
+        form.scrollIntoView();
     }
 
     private void clearForm() {
