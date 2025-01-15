@@ -125,15 +125,6 @@ public class PersonView extends GenericView<Person> {
       super(Person.class);
       this.dataService = dataService;
       refreshGrid();
-
-      // Add Button for adding new person
-      Div addButton = new Div();
-      addButton.setClassName("circle-button-container");
-      Avatar addAvatar = new Avatar("+");
-      addAvatar.addClassName("circle-button");
-      addButton.add(addAvatar);
-      addButton.addClickListener(event -> addNew());
-      gridContainer.addComponentAsFirst(addButton);
    }
 
    @Override
