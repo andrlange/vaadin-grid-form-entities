@@ -7,7 +7,7 @@ Based on:
 - JDK21
 
 ### NEW
-- Added Vaadin Component-Column example to GenericGrid for Boolean values of entity properties und methods.
+- Added Vaadin Component-Column example to GenericGrid for Boolean values of entity properties and methods.
 - Added Spring Boot Starter Validation to enable Form validation.
 
 ## Annotations
