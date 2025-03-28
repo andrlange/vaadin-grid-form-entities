@@ -54,4 +54,7 @@ public class Person implements BaseEntity {
         if (birthday == null) return 0;
         return Period.between(birthday.atStartOfDay().toLocalDate(), LocalDate.now()).getYears();
     }
+
+    @GridColumn(header = "Anrede", order = 7)
+    private String salutation;
 }

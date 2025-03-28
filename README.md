@@ -2,8 +2,8 @@
 This demo shows how you can extend your data entities to auto-generate Grids and Forms.
 
 Based on:
-- Spring Boot 3.4.2
-- Vaadin Flow 24.6.4
+- Spring Boot 3.4.4
+- Vaadin Flow 24.7.1
 - JDK21
 
 ### NEW

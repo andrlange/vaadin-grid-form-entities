@@ -17,13 +17,13 @@ public class DataService {
     public DataService() {
         persons.addAll(List.of(
                 new Person(1L, "John", "Doe", "john.doe@example.com", true,
-                        LocalDate.of(1971, 3, 4)),
+                        LocalDate.of(1971, 3, 4),"Herr"),
                 new Person(2L, "Jane", "Smith", "jane.smith@example.com", false
-                        , LocalDate.of(1975, 6, 12)),
+                        , LocalDate.of(1975, 6, 12),"Herr"),
                 new Person(3L, "Bob", "Johnson", "bob.johnson@example.com", true,
-                        LocalDate.of(1990, 1, 24)),
+                        LocalDate.of(1990, 1, 24),"Herr"),
                 new Person(4L, "Alice", "Williams", "alice.williams@example.com", true,
-                        LocalDate.of(1985, 11, 23))));
+                        LocalDate.of(1985, 11, 23),"Herr")));
 
         addresses.addAll(List.of(
                 new Address(1L, "123 Main St", "New York", "USA", "10001"),
