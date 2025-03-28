@@ -49,7 +49,7 @@ This demo provides two entity types:
 #### Example
 
 ```JAVA
-@@Data
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Person implements BaseEntity {
